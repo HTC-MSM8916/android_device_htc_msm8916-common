@@ -203,8 +203,7 @@ static void rmnet_api_usage(void)
 	printf(_2TABS" device node\n\n");
 }
 
-static void print_rmnetctl_lib_errors(uint16_t error_number)
-{
+static void print_rmnetctl_lib_errors(uint16_t error_number)  {
 	if ((error_number > RMNETCTL_API_SUCCESS) &&
 		(error_number < RMNETCTL_API_ERR_ENUM_LENGTH)) {
 		printf("%s", rmnetctl_error_code_text[error_number]);
@@ -229,13 +228,16 @@ static void print_rmnet_api_status(int return_code, uint16_t error_number)
 {
 	if (return_code == RMNETCTL_SUCCESS)
 		printf("SUCCESS\n");
-	else if (return_code == RMNETCTL_LIB_ERR) {
+	else if (return_code == RMNETCTL_LIB_ERR)
 		printf("LIBRARY ");
-		print_rmnetctl_lib_errors(error_number);
-	} else if (return_code == RMNETCTL_KERNEL_ERR)
-		printf("KERNEL %s", rmnetctl_error_code_text[error_number]);
+	else if (return_code == RMNETCTL_KERNEL_ERR)
+		printf("KERNEL : Error code %u\n", error_number);
 	else if (return_code == RMNETCTL_INVALID_ARG)
 		printf("INVALID_ARG\n");
+
+	if (return_code == RMNETCTL_LIB_ERR) {
+		print_rmnetctl_lib_errors(error_number);
+	}
 }
 
 /*!
@@ -352,17 +354,15 @@ static int rmnet_api_call(int argc, char *argv[])
 		if (!egress_dev_name) {
 			print_rmnet_api_status(RMNETCTL_LIB_ERR,
 			RMNETCTL_CFG_FAILURE_EGRESS_DEV_NAME_NULL);
-			rmnetctl_cleanup(handle);
 			return RMNETCTL_LIB_ERR;
 		}
 		return_code = rmnet_get_logical_ep_config(handle,
 		_STRTOI32(argv[1]), argv[2], &rmnet_mode,
-		&egress_dev_name, RMNET_MAX_STR_LEN, &error_number);
+		&egress_dev_name, &error_number);
 		if (return_code == RMNETCTL_SUCCESS) {
 			printf("rmnet_mode is %u\n", rmnet_mode);
 			printf("egress_dev_name is %s\n", egress_dev_name);
 		}
-		free(egress_dev_name);
 	} else if (!strcmp(*argv, "addvnctcflow")) {
 		_RMNETCLI_CHECKNULL(argv[1]);
 		_RMNETCLI_CHECKNULL(argv[2]);
