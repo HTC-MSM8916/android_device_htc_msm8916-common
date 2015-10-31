@@ -126,6 +126,9 @@ EXTENDED_FONT_FOOTPRINT := true
 TARGET_INIT_VENDOR_LIB := libinit_msm
 TARGET_PLATFORM_DEVICE_BASE := /devices/soc.0/
 
+# Libc extensions
+BOARD_PROVIDES_ADDITIONAL_BIONIC_STATIC_LIBS += libc_htc_symbols
+
 # Power
 TARGET_POWERHAL_VARIANT := qcom
 
