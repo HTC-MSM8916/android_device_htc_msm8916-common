@@ -147,8 +147,11 @@ BOARD_SEPOLICY_DIRS += \
 BOARD_SEPOLICY_UNION += \
     bluetooth_loader.te \
     healthd.te \
+    pnpmgr.te \
     qseecomd.te \
+    rmt_storage.te \
     surfaceflinger.te \
+    thermal-engine.te \
     wcnss_service.te \
     file_contexts \
     property_contexts

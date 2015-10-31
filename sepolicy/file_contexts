@@ -6,3 +6,5 @@
 
 /dev/smd3                                       u:object_r:hci_attach_dev:s0
 /dev/mmc3416x                                   u:object_r:sensors_device:s0
+
+/system/bin/pnpmgr                              u:object_r:pnpmgr_exec:s0
