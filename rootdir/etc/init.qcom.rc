@@ -32,12 +32,15 @@ import init.target.rc
 on early-init
     mount debugfs debugfs /sys/kernel/debug
     mkdir /firmware 0771 system system
+    mkdir /firmware/image 0771 system system
     mkdir /system 0777 root root
+    mkdir /vendor/firmware 0771 system system
     symlink /data/tombstones /tombstones
 
 on init
     # Set permissions for persist partition
     mkdir /persist 0771 system system
+    symlink /data/persist /persist
 
     # See storage config details at http://source.android.com/tech/storage/
     mkdir /mnt/shell/emulated 0700 shell shell
@@ -62,8 +65,79 @@ on init
     symlink /storage/usbdisk /usbdisk
     symlink /storage/usbdisk /mnt/usbdisk
 
+# init PnPMgr node
+    chmod 664 /sys/power/pnpmgr/apps/media_mode
+    chown media system /sys/power/pnpmgr/apps/media_mode
+    chown system /sys/power/pnpmgr/apps/activity_trigger
+    chown system /sys/power/pnpmgr/apps/non_activity_trigger
+    chown system /sys/power/perflock
+    chown system /sys/power/launch_event
+    chown system /sys/power/powersave
+    chown system /sys/power/cpufreq_ceiling
+    chown system /sys/power/cpunum_floor
+    chown system /sys/power/cpunum_ceiling
+    chown system /sys/power/pnpmgr/hotplug/touch_boost
+    chown root system /sys/module/lowmemorykiller/parameters/adj
+    chmod 0664 /sys/module/lowmemorykiller/parameters/adj
+    chown root system /sys/module/lowmemorykiller/parameters/minfree
+    chmod 0664 /sys/module/lowmemorykiller/parameters/minfree
+    chown system /sys/power/wait_for_fb_status
+
+    write /sys/power/pnpmgr/hotplug/mp_decision_ms 50
+    write /sys/power/pnpmgr/hotplug/mp_max_cpus 4
+    write /sys/power/pnpmgr/hotplug/mp_min_cpus 1
+    write /sys/power/pnpmgr/hotplug/mp_ns "0 1.1 2.1 3.1"
+    write /sys/power/pnpmgr/hotplug/mp_nw "0 1.9 2.7 3.5"
+    write /sys/power/pnpmgr/hotplug/mp_ts "0 190 240 240"
+    write /sys/power/pnpmgr/hotplug/mp_tw "0 140 90 90"
+    write /sys/power/pnpmgr/hotplug/mp_util_high_and "0 35 0 0"
+    write /sys/power/pnpmgr/hotplug/mp_util_high_or "0 75 400 400"
+    write /sys/power/pnpmgr/hotplug/mp_util_low_and "0 30 400 400"
+    write /sys/power/pnpmgr/hotplug/mp_util_low_or "0 20 0 0"
+    write /sys/power/pnpmgr/apps/activity_trigger "booting"
+
+# HTC SSD Battery - BEGIN
+    chown system system /sys/class/power_supply/battery/full_level_dis_batt_chg
+    chmod 0220 /sys/class/power_supply/battery/full_level_dis_batt_chg
+    chown radio radio /sys/class/power_supply/battery/phone_call
+    chmod 0660 /sys/class/power_supply/battery/phone_call
+    chown media media /sys/class/power_supply/battery/play_music
+    chmod 0220 /sys/class/power_supply/battery/play_music
+    chown radio radio /sys/class/power_supply/battery/network_search
+    chmod 0220 /sys/class/power_supply/battery/network_search
+    chown system system /sys/class/power_supply/battery/navigation
+    chmod 0220 /sys/class/power_supply/battery/navigation
+    chown system system /sys/class/power_supply/battery/disable_limit_chg
+    chmod 0220 /sys/class/power_supply/battery/disable_limit_chg
+# HTC SSD Battery - END
+
+    # for BMA2x2 BOSCH
+    chown system system /sys/class/htc_g_sensor/bma2x2/enable
+    chown system system /sys/class/htc_g_sensor/bma2x2/value
+    chown system system /sys/class/htc_g_sensor/bma2x2/set_k_value
+    chown system system /sys/class/htc_g_sensor/bma2x2/set_k_value_msb
+
+    # HTC LED
+    setprop ro.product.nled_off 1
+
+    # TOUCH DEBUG
+    chown system system /proc/ctp_selftest
+
 on fs
+    mkdir /devlog 0700 root root
+    mkdir /fataldevlog 0700 root root
+
+    mkdir /firmware/radio 0771 system system
+    mkdir /firmware/wcnss 0771 system system
+
     mount_all fstab.qcom
+
+    exec /system/bin/sh /init.qcom.firmware_links.sh /firmware/radio /firmware/image "modem* mba*"
+    exec /system/bin/sh /init.qcom.firmware_links.sh /firmware/wcnss /firmware/image "wcnss*"
+    exec /system/bin/sh /init.qcom.wcnss_wlan.sh
+
+    exec /system/bin/sh /init.qcom.firmware_links.sh /system/vendor/firmware /vendor/firmware "keymaster.*"
+
     mkdir /persist/data 0700 system system
     restorecon_recursive /persist
     setprop ro.crypto.fuse_sdcard true
@@ -185,10 +259,10 @@ on early-boot
     # set RLIMIT_MEMLOCK to 64MB
     setrlimit 8 67108864 67108864
     # Allow subsystem (modem etc) debugging
-    write /sys/module/subsystem_restart/parameters/enable_debug ${persist.sys.ssr.enable_debug}
-    write /sys/module/pil_msa/parameters/pbl_mba_boot_timeout_ms ${persist.sys.mba_boot_timeout}
-    write /sys/module/pil_msa/parameters/modem_auth_timeout_ms ${persist.sys.modem_auth_timeout}
-    write /sys/module/peripheral_loader/parameters/proxy_timeout_ms ${persist.sys.pil_proxy_timeout}
+#    write /sys/module/subsystem_restart/parameters/enable_debug ${persist.sys.ssr.enable_debug}
+#    write /sys/module/pil_msa/parameters/pbl_mba_boot_timeout_ms ${persist.sys.mba_boot_timeout}
+#    write /sys/module/pil_msa/parameters/modem_auth_timeout_ms ${persist.sys.modem_auth_timeout}
+#    write /sys/module/peripheral_loader/parameters/proxy_timeout_ms ${persist.sys.pil_proxy_timeout}
     write /sys/kernel/boot_adsp/boot 1
 
 on boot
@@ -325,12 +399,17 @@ on property:vold.decrypt=trigger_restart_framework
 on property:persist.env.fastdorm.enabled=true
     setprop persist.radio.data_no_toggle 1
 
+on property:ro.config.low_ram=true
+    write /sys/kernel/mm/ksm/pages_to_scan 100
+    write /sys/kernel/mm/ksm/sleep_millisecs 500
+    write /sys/kernel/mm/ksm/run 1
+
 service irsc_util /system/bin/logwrapper /system/bin/irsc_util "/etc/sec_config"
     class main
     user root
     oneshot
 
-service rmt_storage /system/bin/rmt_storage
+service rmt_storage /system/bin/rmt_storage modem_st1 modem_st2 fsc recovery radio_config cdma_record
     class core
     user root
 
@@ -464,11 +543,6 @@ service dhcpcd_bnep4 /system/bin/dhcpcd -BKLG
     disabled
     oneshot
 
-service loc_launcher /system/bin/loc_launcher
-    #loc_launcher will start as root and set its uid to gps
-    class late_start
-    group gps inet net_raw qcom_diag net_admin wifi
-
 service wifi-crda /system/bin/sh /system/etc/init.crda.sh
    class late_start
    user root
@@ -486,29 +560,6 @@ on property:ro.data.large_tcp_window_size=true
     # Adjust socket buffer to enlarge TCP receive window for high bandwidth (e.g. DO-RevB)
     write /proc/sys/net/ipv4/tcp_adv_win_scale  2
 
-on property:ro.product.cpu.abi=arm64-v8a
-    setprop rild.libpath /system/vendor/lib64/libril-qc-qmi-1.so
-
-on property:ro.product.cpu.abi=armeabi-v7a
-    setprop rild.libpath /system/vendor/lib/libril-qc-qmi-1.so
-
-service ril-daemon1 /system/bin/rild -c 2
-    class main
-    socket rild2 stream 660 root radio
-    socket rild-debug2 stream 660 radio system
-    user root
-    group radio cache inet misc audio sdcard_r sdcard_rw diag qcom_diag log
-
-service charger /charger
-    class charger
-    group log
-    seclabel u:r:healthd:s0
-
-service ssr_diag /system/bin/ssr_diag
-    class late_start
-    user system
-    group system
-
 service hvdcp /system/bin/hvdcp
     class core
     user root
@@ -522,7 +573,7 @@ on property:persist.usb.hvdcp.detect=false
 
 #start camera server as daemon
 service qcamerasvr /system/bin/mm-qcamera-daemon
-    class late_start
+    class main
     user camera
     group camera system inet input graphics
 
@@ -538,16 +589,65 @@ service qseecomd /system/bin/qseecomd
    user root
    group root
 
-service perfd /system/bin/perfd
-   class main
-   user root
-   group root
-   disabled
+#
+# start multiple rilds based on multisim property
+#
+on property:persist.radio.multisim.config=dsds
+    stop ril-daemon
+    start ril-daemon
+    start ril-daemon1
+
+on property:persist.radio.multisim.config=dsda
+    stop ril-daemon
+    start ril-daemon
+    start ril-daemon1
+
+on property:persist.radio.multisim.config=tsts
+    stop ril-daemon
+    start ril-daemon
+    start ril-daemon1
+    start ril-daemon2
+
+service mpdecision /system/bin/mpdecision --avg_comp
+    class core
+    user root
+    disabled
 
 service thermal-engine /system/bin/thermal-engine
    class main
    user root
    group root
+
+service pnpmgr /system/bin/pnpmgr
+    class core
+    user root
+
+on property:init.svc.bootanim=stopped
+    # Overwrite ActivityManager's low memory killer settings
+    write /sys/module/lowmemorykiller/parameters/adj "0,4,7,8,9,12"
+    write /sys/module/lowmemorykiller/parameters/minfree "6144,18432,21504,23040,34576,40720"
+
+on property:init.svc.thermal-engine=stopped
+    write /sys/power/pnpmgr/thermal/thermal_final 9999999
+    write /sys/power/pnpmgr/thermal/thermal_final_cpu 9999999
+    write /sys/power/pnpmgr/thermal/thermal_c0 9999999
+    write /sys/power/pnpmgr/thermal/thermal_c1 9999999
+    write /sys/power/pnpmgr/thermal/thermal_c2 9999999
+    write /sys/power/pnpmgr/thermal/thermal_c3 9999999
+    write /sys/power/pnpmgr/thermal/thermal_g0 999999999
+    write /sys/power/pnpmgr/thermal/thermal_final_gpu 999999999
+    write /sys/power/pnpmgr/thermal/thermal_batt 0
+
+service qb_offmode_alarm /system/bin/qb_offmode_alarm
+    class main
+    user root
+    disabled
+    oneshot
+
+service zchgd_offmode /system/bin/zchgd -pseudooffmode -autostop -poffmodewarn
+    user root
+    group root graphics
+    disabled
 
 service time_daemon /system/bin/time_daemon
    class late_start
@@ -558,22 +658,3 @@ service audiod /system/bin/audiod
    class late_start
    user system
    group system
-
-service ppd /system/bin/mm-pp-daemon
-    class late_start
-    disabled
-    user system
-    socket pps stream 0660 system system
-    group system graphics
-
-on property:init.svc.surfaceflinger=stopped
-    stop ppd
-
-on property:init.svc.surfaceflinger=running
-    start ppd
-
-service wcnss-service /system/bin/wcnss_service
-    class main
-    user system
-    group system wifi radio
-    oneshot

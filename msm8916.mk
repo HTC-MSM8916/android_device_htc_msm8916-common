@@ -150,13 +150,22 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     init.crda.sh \
     init.qcom.bt.sh \
-    init.qcom.coex.sh
+    init.qcom.coex.sh \
+    init.qcom.fm.sh \
+    init.qcom.post_boot.sh
 
 PRODUCT_PACKAGES += \
+    init.class_main.sh \
+    init.gyrocali.sh \
+    init.network.sk \
     init.qcom.rc \
     init.qcom.power.rc \
     init.qcom.usb.rc \
+    init.qcom.class_core.sh \
+    init.qcom.firmware_links.sh \
+    init.qcom.wcnss_wlan.sh \
     init.recovery.qcom.rc \
+    init.usbdiag.sh \
     ueventd.qcom.rc
 
 # Recovery
