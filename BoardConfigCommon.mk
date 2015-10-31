@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-VENDOR_PATH := device/cyanogen/msm8916-common
+VENDOR_PATH := device/htc/msm8916-common
+
+BOARD_VENDOR := htc
 
 TARGET_SPECIFIC_HEADER_PATH := $(VENDOR_PATH)/include
-
-TARGET_CYANOGEN_COMMON := msm8916
 
 # Platform
 TARGET_BOARD_PLATFORM := msm8916
@@ -186,4 +186,4 @@ WIFI_DRIVER_FW_PATH_STA := "sta"
 WPA_SUPPLICANT_VERSION := VER_0_8_X
 
 # inherit from the proprietary version
--include vendor/cyanogen/msm8916-common/BoardConfigVendor.mk
+-include vendor/htc/msm8916-common/BoardConfigVendor.mk
