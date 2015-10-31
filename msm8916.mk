@@ -92,6 +92,10 @@ PRODUCT_PACKAGES += \
     libtinyxml \
     memtrack.msm8916
 
+# Dot View Case
+PRODUCT_PACKAGES += \
+    Dotcase
+
 # Filesystem
 PRODUCT_PACKAGES += \
     e2fsck \
