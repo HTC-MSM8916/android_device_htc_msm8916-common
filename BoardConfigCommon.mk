@@ -90,7 +90,7 @@ BLUETOOTH_HCI_USE_MCT := true
 MALLOC_IMPL := dlmalloc
 
 # Crypto
-TARGET_HW_DISK_ENCRYPTION := true
+TARGET_HW_DISK_ENCRYPTION := false
 
 # Dex
 ifeq ($(HOST_OS),linux)
