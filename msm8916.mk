@@ -161,11 +161,13 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     init.class_main.sh \
     init.gyrocali.sh \
-    init.network.sk \
+    init.network.sh \
+    init.qcom.sh \
     init.qcom.rc \
     init.qcom.power.rc \
     init.qcom.usb.rc \
     init.qcom.class_core.sh \
+    init.qcom.factory.sh \
     init.qcom.firmware_links.sh \
     init.qcom.wcnss_wlan.sh \
     init.recovery.qcom.rc \
