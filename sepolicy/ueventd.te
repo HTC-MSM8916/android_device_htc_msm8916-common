@@ -1,0 +1,1 @@
+allow ueventd vibe_dev:file getattr;

@@ -86,6 +86,11 @@ BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
 BLUETOOTH_HCI_USE_MCT := true
 
+# CMHW
+BOARD_HARDWARE_CLASS := \
+    $(VENDOR_PATH)/cmhw \
+    hardware/cyanogen/cmhw
+
 # malloc implementation
 MALLOC_IMPL := dlmalloc
 
@@ -147,12 +152,17 @@ BOARD_SEPOLICY_DIRS += \
 
 BOARD_SEPOLICY_UNION += \
     bluetooth_loader.te \
+    file.te \
     healthd.te \
+    kernel.te \
     pnpmgr.te \
     qseecomd.te \
     rmt_storage.te \
     surfaceflinger.te \
+    system_server.te \
     thermal-engine.te \
+    ueventd.te \
+    vibe_dev.te \
     wcnss_service.te \
     file_contexts \
     property_contexts

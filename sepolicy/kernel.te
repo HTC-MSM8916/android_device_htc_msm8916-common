@@ -1,0 +1,1 @@
+allow kernel vibe_dev:file relabelto;

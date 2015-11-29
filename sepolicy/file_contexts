@@ -8,3 +8,5 @@
 /dev/mmc3416x                                   u:object_r:sensors_device:s0
 
 /system/bin/pnpmgr                              u:object_r:pnpmgr_exec:s0
+
+/sys/devices/virtual/timed_output/vibrator/voltage_level u:object_r:vibe_dev:s0
